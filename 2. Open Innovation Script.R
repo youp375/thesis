@@ -16,8 +16,6 @@ library(base)
 library(corpus)
 library(readxl)
 
-#WORKING DIRECTORY: 
-#setwd("~/Documents/BAM/Thesis/Data")
 
 #READING IN PATENTDATA
 bath <- read_csv("Patentdata/bath.csv", skip=1)
@@ -122,10 +120,10 @@ patentdata <- bind_rows(bath, belfast, birmingham, brighton, bristol, cambridge,
                         newcastle, nottingham, reading, sheffield, southampton)
 colnames(patentdata) <- c('id', 'title', 'assignee', 'author', 'prioritydate', 'filingdate',
                           'publicationdate', 'grantdate', 'link', 'representativelink', 'city')
-write.csv(patentdata, 'patentdata.csv')
+write.csv(patentdata, 'data/patentdata.csv')
 
 ###START FROM HERE
-patentdata2 <- read_csv('patentdata.csv')
+patentdata2 <- read_csv('data/patentdata.csv')
 names(patentdata2)[names(patentdata2) == '...1'] <- 'index'
 
 ##FURTHER CODING
@@ -143,7 +141,7 @@ patentcopy$word <- text_tokens(patentcopy$word, stemmer = 'en')
 patentcopy$word <- as.character(patentcopy$word)
 
 #READ IN KEYWORDS
-keywords <- read_excel("keywords.xlsx")
+keywords <- read_excel("data/keywords.xlsx")
 keywords$word <- as.character(keywords$word)
 keywords <- keywords %>% 
   unnest_tokens(word, word)

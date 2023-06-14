@@ -17,10 +17,10 @@ library(car)
 library(plm)
 
 #WORKING DIRECTORY
-#setwd("~/Documents/BAM/Thesis/Data")
+
 
 #READ IN DATA
-analysis_data <- read.csv('analysisdata.csv')
+analysis_data <- read.csv('data/analysisdata.csv')
 analysis_data <- analysis_data %>% 
   dplyr::select('name', 'year', 'city', 'description', 'industry', 'logtotalfunding', 'ipostatus',
                 'employees', 'description', 'founders',
@@ -47,61 +47,71 @@ stargazer(cor_matrix, no.space=TRUE)
 mdlprob <- seriesafunding ~ cum_patents_city + cum_patents_industry + log(num_founders) + industry 
 mdllog <- logseriesa ~ cum_patents_city + cum_patents_industry + log(num_founders) + logseed + industry
 
+
 #Models 1
-rsltprobPOOL <- 
-  plm(mdlprob, data = analysis_data1, 
-      model = "pooling")
 rsltprobFE <- 
   plm(mdlprob, data = analysis_data1, 
-      index=c("name", "year"), model = "within")
-
-rsltprobRE <- 
-  plm(mdlprob, data = analysis_data1,
-      index=c('name', 'year'), model = 'random')
-
+      index=c("year"), model = "within")
 
 #MULTICOLLINEARITY
-vif_values_pool <- vif(rsltprobPOOL)
+vif_values_pool <- vif(rsltprobFE)
 
 
 #Models 2
-rsltlogPOOL <- 
-  plm(mdllog, data = analysis_data1, 
-      model = "pooling")
 rsltlogFE <- 
   plm(mdllog, data = analysis_data1, 
-      index=c("name", "year"), model = "within")
-
-rsltlogRE <- 
-  plm(mdllog, data = analysis_data1,
-      index=c('name', 'year'), model = 'random')
+      index=c("year"), model = "within")
 
 #VIF Analyis
-
 vif_values_log <- vif(rsltlogPOOL)
 print(vif_values_log)
 
 #Effects per country > handig om te checken:
 summary(fixef(rsltprobFE, type="dmean"))
 
-#Kiezen:
-## TESTS H1/3
-#Pooled to FE
-pFtest(rsltprobFE, rsltprobPOOL)
+stargazer(rsltprobFE, rsltlogFE, title = 'Regression Results', 
+          align=TRUE, no.space =TRUE, intercept.bottom=FALSE, type='text')
 
-#FE to RE
-phtest(rsltprobFE, rsltprobRE)
 
-##TESTS H2/4
-#Pooled to FE
-pFtest(rsltlogFE, rsltlogPOOL)
+#ROBUSTNESS CHECKS
 
-#FE to RE
-phtest(rsltprobFE, rsltprobRE)
+#Including startup effects
 
-stargazer(rsltprobPOOL, rsltprobFE, rsltprobRE, title = 'Regression Results', 
-          align=TRUE, no.space =TRUE, intercept.bottom=FALSE )
+mdlprobfe <- seriesafunding ~ cum_patents_city + cum_patents_industry 
+mdllogfe <- logseriesa ~ cum_patents_city + cum_patents_industry 
 
-stargazer(rsltlogPOOL, rsltlogFE, rsltlogRE, align=TRUE, no.space =TRUE, intercept.bottom=FALSE)
+m1 <- plm(mdlprobfe, data = analysis_data1, 
+      index=c("name", "year"), model = "within")
+
+m2 <-plm(mdllogfe, data = analysis_data1, 
+      index=c("name", "year"), model = "within")
+
+nolondon <- analysis_data1 %>% 
+  filter(
+    city != 'London'
+  )
+onlyht <- analysis_data1 %>% 
+  filter(
+    industry == 'Energy'| industry == 'Deep Tech'|industry =='Healthcare'
+  )
+
+m3 <- 
+  plm(mdlprob, data = nolondon, 
+      index=c("year"), model = "within")
+
+m4 <- 
+  plm(mdllog, data = nolondon, 
+      index=c("year"), model = "within")
+
+m5 <-  plm(mdlprob, data = onlyht, 
+                   index=c("year"), model = "within")
+
+m6 <- 
+  plm(mdllog, data = onlyht, 
+      index=c("year"), model = "within")
+
+stargazer(m1,m3,m5,m2,m4,m6, title = 'Robustness Check',
+          align = TRUE, no.space = TRUE, intercept.bottom = FALSE)
+
 
 

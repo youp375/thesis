@@ -19,9 +19,6 @@ library(MASS)
 library(sandwich)  
 library(extraDistr)
 
-#SETTING WORKING DIRECTORY
-#setwd("~/Documents/BAM/Thesis/Data")
-
 #MERGE THE DATAFRAMES INTO ONE
 merged_dataset <- merge(panel_startups_final, panel_patents_city, by = c("city", "year"))
 merged_dataset <- merge(merged_dataset, panel_patents_industry, by = c("industry", 'year'), all.x = TRUE)
@@ -57,11 +54,11 @@ analysis_data <- analysis_data %>%
          'logseed', 'logseriesa', 'n_patents','cum_patents_city', 'n_patents_ind', 'cum_patents_industry'
   )
 
-write.csv(analysis_data, 'analysisdata.csv')
+write.csv(analysis_data, 'data/analysisdata.csv')
 
 ###EXPLORATORY ANALYSIS:
 
-analysis_data <- read.csv('analysisdata.csv')
+analysis_data <- read.csv('data/analysisdata.csv')
 
 #CREATE EXPLORATORY STATISTICS
 stargazer(analysis_data)
@@ -94,6 +91,15 @@ analysis_data %>%
   group_by(seriesafunding) %>%
   summarise(sum(seriesafunding))
 
+merged_dataset_clean %>% 
+  filter(seed_amount != 0) %>% 
+  summarise(mean(seed_amount),
+            sd(seed_amount))
+
+merged_dataset_clean %>% 
+  filter(seriesa_amount != 0) %>% 
+  summarise(mean(seriesa_amount),
+            sd(seriesa_amount))         
 
 
 

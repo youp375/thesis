@@ -18,17 +18,15 @@ library(tidyverse)
 library(base)
 library(corpus)
 
-#WORKING DIRECTORY: 
-#setwd("~/Documents/BAM/Thesis/Data")
 
 #READING IN MY DATA
-data1314 <- read_csv("DATA 13:14 SCRIPS.csv")
-data1415 <- read_csv("DATA 14:15 scrips.csv")
-data1516 <- read_csv("DATA 15:16.csv")
-data1617 <- read_csv("DATA 16:17.csv")
-data1718 <- read_csv("DATA 17:18.csv")
-data1819 <- read_csv("DATA 18:19.csv")
-#startupstest <-read_csv("testcompanies.csv")
+data1314 <- read_csv("data/DATA 13:14 SCRIPS.csv")
+data1415 <- read_csv("data/DATA 14:15 scrips.csv")
+data1516 <- read_csv("data/DATA 15:16.csv")
+data1617 <- read_csv("data/DATA 16:17.csv")
+data1718 <- read_csv("data/DATA 17:18.csv")
+data1819 <- read_csv("data/DATA 18:19.csv")
+
 
 #SOME DATA HAS A DIFFERENT STRUCTURE: 
 data1316 <- rbind(data1314, data1415, data1516)
@@ -80,12 +78,12 @@ data1619 <- data1619[, c('name', 'cbprofile', 'totalfunding', 'totalfundingcurre
                          'lastfundingdate')]
 full_data <- bind_rows(data1316, data1619)
 full_data$name <- trimws(full_data$name)
-write.csv(full_data, 'Startup Data.csv')
+write.csv(full_data, 'data/Startup Data.csv')
 
 ################################################################################
 
 #READ IN THE DATA
-full_data <- read.csv('Startup Data.csv')
+full_data <- read.csv('data/Startup Data.csv')
 
 #CHANGE HEADQUARTERS TO CITY NAMES
 full_data <- full_data  %>% 
@@ -138,7 +136,7 @@ other <- matrixuk %>%
   )
 
 #ENRICH THE SERIES A FILE WITH INFORMATION ABOUT THEIR SEED ROUNDS. 
-seedrounds <- read_csv('seedround.csv')
+seedrounds <- read_csv('data/seedround.csv')
 
 #CHANGE NAMES
 seedrounds2 <- seedrounds %>% 
@@ -184,7 +182,7 @@ dataset3 <- dataset3 %>%
 names(dataset3)[names(dataset3) == 'yearlastfunding'] <- 'yearseriesA'
 
 #OTHER ROUNDS:
-otherrounds <- read_csv('furtherfunding.csv')
+otherrounds <- read_csv('data/furtherfunding.csv')
 
 #MAKE SURE TO ONLY KEEP THE RELEVANT VARIABLES
 otherrounds <- otherrounds %>% 
